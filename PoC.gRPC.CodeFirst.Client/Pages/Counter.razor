@@ -1,0 +1,71 @@
+﻿@page "/counter"
+@using PoC.gRPC.CodeFirst.Client.Data
+@using PoC.gRPC.CodeFirst.Shared.Contract.DataContract
+
+<PageTitle>Counter</PageTitle>
+
+@inject DataService DataService
+
+<h1>Counter</h1>
+
+<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+<br />
+<br />
+<h1>gRPC</h1>
+<br />
+<button class="btn btn-primary" @onclick="GetGrpc">Get gRPC data</button>
+<br /> 
+<br /> 
+Reply: @reply
+<br />
+<br />
+<button class="btn btn-primary" @onclick="GetGrpcStream">Get gRPC streamed data</button>
+<br />
+<br />
+Reply: @replyStream
+<br />
+Body:
+<p style="max-width: 1000px; padding: 10px; border: 1px solid #aaa;">
+    @replyStreamBody
+</p>
+
+
+@code {
+    private int currentCount = 0;
+    private string reply = string.Empty;
+    private string replyStream = string.Empty;
+    private string replyStreamBody = string.Empty;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+
+    private async Task GetGrpc()
+    {
+        var message = (await DataService.GetData())?.Message;
+        if (message is not null)
+        {
+            reply = message;
+        }
+    }
+
+    private async Task GetGrpcStream()
+    {
+        IAsyncEnumerable<HelloReply?> responses = DataService.GetDataStream();
+        await foreach (var response in responses)
+        {
+            if (response?.Message is not null)
+            {
+                replyStream = response.Message;
+                replyStreamBody = string.Join(';', response.KeyValues.Select(kv => $"{kv.Key} {string.Join(",", kv.Value)}"));
+                StateHasChanged();
+            }
+        }
+
+        replyStream += " Done ;-)";
+    }
+}

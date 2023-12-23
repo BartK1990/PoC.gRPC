@@ -1,0 +1,12 @@
+{
+  "Version": 3,
+  "ListAllProjects": false,
+  "MultiProjectConfigurations": {
+    "CodeFirst": {
+      "Projects": {
+        "PoC.gRPC.CodeFirst.Client": {},
+        "PoC.gRPC.CodeFirst.Server": {}
+      }
+    }
+  }
+}
